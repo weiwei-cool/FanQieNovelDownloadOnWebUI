@@ -5,6 +5,8 @@ import axios from 'axios';
 const showApp = ref(true);
 let showSuccess = ref(false);
 let showWarning = ref(false);
+let showReturn = ref(false);
+let returnList =ref([]);
 const downloadOption = ref('single');
 const singleFileInput = ref('');
 const bulkFileInput = ref('');
@@ -15,14 +17,20 @@ let urls = [];
 const startDownload = async () => {
   showSuccess.value = false;
   showWarning.value = false;
+  showReturn.value = false;
 
   if (downloadOption.value === 'single') {
     console.log('Downloading single file:', singleFileInput.value);
     // 检查单文件下载的URL
     if (isValidURL(singleFileInput.value) && singleFileInput.value.includes('/page/')) {
       console.log('Downloading single file:', singleFileInput.value);
-      showSuccess.value = true; // 显示成功提示框
-      await sendPostRequest([singleFileInput.value], formatOption.value);
+      let ret = await sendPostRequest([singleFileInput.value], formatOption.value);
+      if(ret.data.return.length > 0)
+      {
+        returnList.value = ret.data.return;
+        showReturn.value = true;
+      }
+      else showSuccess.value = true; // 显示成功提示框
     } else {
       showWarning.value = true; // 显示警告提示框
     }
@@ -32,8 +40,13 @@ const startDownload = async () => {
     const isValidBulk = urls.every(url => isValidURL(url) && url.includes('/page/'));
     if (isValidBulk) {
       console.log('Downloading multiple files:', urls);
-      showSuccess.value = true; // 显示成功提示框
-      await sendPostRequest(urls, formatOption.value);
+      let ret = await sendPostRequest(urls, formatOption.value);
+      if(ret.data.return.length > 0)
+      {
+        returnList.value = ret.data.return;
+        showReturn.value = true;
+      }
+      else showSuccess.value = true; // 显示成功提示框
     } else {
       showWarning.value = true; // 显示警告提示框
     }
@@ -50,6 +63,7 @@ async function sendPostRequest(urls, format) {
   try {
     const response = await axios.post('/api/down/', { urls, format });
     console.log('POST request successful:', response.data);
+    return response
   } catch (error) {
     console.error('POST request failed:', error);
   }
@@ -95,6 +109,9 @@ async function sendPostRequest(urls, format) {
       </div>
       <div class="alert alert-warning" v-show="showWarning">
         <strong>警告!</strong> 请输入正确的目录链接！
+      </div>
+      <div class="alert alert-warning" v-if="showReturn" v-for="item in returnList">
+        <strong>警告!</strong> {{ item }} 重复提交
       </div>
     </div>
     <button class="btn btn-primary mt-3"><a href="/history" style="text-decoration:none;color:inherit;">下载任务</a></button>

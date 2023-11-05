@@ -3,13 +3,13 @@
     <h1 class="display-4">下载任务</h1>
   </div>
   <div class="centered-div">
-    <div v-for="item in historyList.history" :key="item.book_id" class="history-item">
+    <div v-for="item in historyList.history" :key="item.obid" class="history-item">
       <h2>{{ item.file_name }}</h2>
       <div class="progress">
         <div class="progress-bar" :style="{ width: `${item.percent}%` }">
         </div>
       </div>{{ item.percent }}%
-      <button class="btn btn-danger mt-3" @click="Delete(item.book_id, item.file_name)">删除</button>
+      <button class="btn btn-danger mt-3" @click="Delete(item.obid, item.file_name)">删除</button>
     </div>
     <div class="alert alert-success" v-show="showDelete">
       <strong>{{ book_name }} 删除成功!</strong>
@@ -25,10 +25,10 @@ const historyList = ref([]);
 let showDelete = ref(false);
 let book_name = ref('');
 
-const Delete = async (book_id, book_name) => {
+const Delete = async (obid, book_name) => {
   showDelete.value = false;
   try {
-    const response = await axios.get(`http://127.0.0.1:8000/api/down/del/${book_id}/`);
+    const response = await axios.get(`/api/down/del/${obid}/`);
     showDelete.value = true;
     location.reload();
   } catch (error) {
@@ -38,7 +38,7 @@ const Delete = async (book_id, book_name) => {
 
 const fetchHistory = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api/history/');
+    const response = await axios.get('/api/history/');
     historyList.value = response.data;
     pollProgress(); // 开始轮询进度
   } catch (error) {
@@ -49,12 +49,11 @@ const fetchHistory = async () => {
 const pollProgress = () => {
   const interval = setInterval(async () => {
     for (const item of historyList.value.history) {
-      console.log(typeof item.percent)
       if(item.percent === 100) continue;
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/history/${item.book_id}/`)
+        const response = await axios.get(`/api/history/${item.obid}/`)
         item.percent = response.data.percent;
-      } catch (error) {contin
+      } catch (error) {
         console.error('Failed to fetch progress:', error);
       }
     }
