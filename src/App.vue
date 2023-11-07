@@ -12,6 +12,7 @@ const singleFileInput = ref('');
 const bulkFileInput = ref('');
 const formatOption = ref('epub'); // 初始化为txt，您可以根据需要设置其他默认值
 
+document.title = '番茄小说下载器';
 let urls = [];
 
 const startDownload = async () => {
