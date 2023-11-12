@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
 const showApp = ref(true);
@@ -69,6 +69,20 @@ async function sendPostRequest(urls, format) {
     console.error('POST request failed:', error);
   }
 }
+
+const fetchDownloadMode = async () => {
+  try {
+    const response = await axios.get('/api/get_config/');
+    console.log(response.data)
+    formatOption.value = response.data["default_download_mode"];
+  } catch (error) {
+    console.error('Failed to fetch history data:', error);
+  }
+};
+
+onMounted(() =>{
+  fetchDownloadMode();
+});
 </script>
 
 <template>

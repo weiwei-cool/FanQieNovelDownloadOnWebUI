@@ -81,7 +81,7 @@ const pollProgress = () => {
 
 const fetchDownloadUrl = async () => {
   try {
-    const response = await axios.get('/api/get_download_url/');
+    const response = await axios.get('/api/get_config/');
     console.log(response.data)
     download_link.value = response.data["download_url"];
   } catch (error) {
