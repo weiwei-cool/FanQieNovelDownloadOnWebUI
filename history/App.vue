@@ -8,8 +8,21 @@
       <div class="progress">
         <div class="progress-bar" :style="{ width: `${item.percent}%` }">
         </div>
-      </div>{{ item.percent }}%
-      <button class="btn btn-danger mt-3" @click="Delete(item.obid, item.file_name)">删除</button>
+      </div>
+      <div class="progress-div">
+        {{ item.percent }}%
+        <a
+            v-if="item.percent === 100"
+            :href="download_link + item.file_name"
+            class="btn btn-primary"
+        >
+          下载
+        </a>
+        <button v-else class="btn btn-secondary" disabled>
+          下载
+        </button>
+        <button class="btn btn-danger mt-3" @click="Delete(item.obid, item.file_name)">删除</button>
+      </div>
     </div>
     <div class="alert alert-success" v-show="showDelete">
       <strong>{{ book_name }} 删除成功!</strong>
@@ -18,12 +31,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import {onMounted, ref} from 'vue';
 import axios from 'axios';
 
 const historyList = ref([]);
 let showDelete = ref(false);
 let book_name = ref('');
+let download_link = ref('');
+
+document.title = '番茄小说下载器 | 下载任务';
 
 const Delete = async (obid, book_name) => {
   showDelete.value = false;
@@ -40,6 +56,8 @@ const fetchHistory = async () => {
   try {
     const response = await axios.get('/api/history/');
     historyList.value = response.data;
+    console.log(response.data)
+    console.log(typeof response.data)
     pollProgress(); // 开始轮询进度
   } catch (error) {
     console.error('Failed to fetch history data:', error);
@@ -53,6 +71,7 @@ const pollProgress = () => {
       try {
         const response = await axios.get(`/api/history/${item.obid}/`)
         item.percent = response.data.percent;
+        console.log(item.percent)
       } catch (error) {
         console.error('Failed to fetch progress:', error);
       }
@@ -60,8 +79,34 @@ const pollProgress = () => {
   }, 800); // 0.8秒钟轮询一次
 };
 
+const fetchDownloadUrl = async () => {
+  try {
+    const response = await axios.get('/api/get_download_url/');
+    console.log(response.data)
+    download_link.value = response.data["download_url"];
+  } catch (error) {
+    console.error('Failed to fetch history data:', error);
+  }
+};
+
+// const fetchDownloadUrl = () => {
+//   axios.get('/api/get_download_url')
+//       .then(response => {
+//         // 从JSON响应中提取URL值
+//          this.downloadUrl = response.data.url;
+//       })
+//       .catch(error => {
+//         console.error('获取下载链接失败', error);
+//       });
+//   return this.downloadUrl
+// }
+
 onMounted(() => {
   fetchHistory(); // 页面加载后开始获取历史数据
+  fetchDownloadUrl()
+  // console.log(download_link);
+  // console.log(typeof  download_link);
+  // console.log(download_link.PromiseResult);
 });
 </script>
 
@@ -111,5 +156,12 @@ onMounted(() => {
   background-color: #007bff;
   color: white;
   transition: width 0.3s ease-in-out;
+}
+
+.progress-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 </style>
