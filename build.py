@@ -37,9 +37,7 @@ for filename in os.listdir(source_history_directory):
             print(f"Copy file: {source_file_path}")
         except Exception as e:
             print(f"Failed to copy file {source_file_path}: {str(e)}")
-# 复制ico文件到其他目录
-shutil.copy2('D:\\bc\\html\\DownloadFanqiePassageInWeb\\dist\\favicon.ico',
-            'D:\\bc\\python\\FanQieNovelDownloadOnWeb\\assets')
+
 # 复制HTML文件到其他目录
 shutil.copy2('D:\\bc\\html\\DownloadFanqiePassageInWeb\\dist\\index.html',
             'D:\\bc\\python\\FanQieNovelDownloadOnWeb\\templates')
