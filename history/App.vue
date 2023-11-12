@@ -89,24 +89,9 @@ const fetchDownloadUrl = async () => {
   }
 };
 
-// const fetchDownloadUrl = () => {
-//   axios.get('/api/get_download_url')
-//       .then(response => {
-//         // 从JSON响应中提取URL值
-//          this.downloadUrl = response.data.url;
-//       })
-//       .catch(error => {
-//         console.error('获取下载链接失败', error);
-//       });
-//   return this.downloadUrl
-// }
-
 onMounted(() => {
   fetchHistory(); // 页面加载后开始获取历史数据
   fetchDownloadUrl()
-  // console.log(download_link);
-  // console.log(typeof  download_link);
-  // console.log(download_link.PromiseResult);
 });
 </script>
 
